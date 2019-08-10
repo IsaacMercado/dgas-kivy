@@ -1,0 +1,193 @@
+<Display>:
+    BoxLayout:
+        orientation: "vertical"
+
+        BoxLayout:
+            size_hint: 1, None
+            height: '48dp'
+            Button:
+                id: button_login
+                text: 'Login'
+                on_release: root.get_screen_login()
+            Button:
+                text: 'Buscar'
+                on_release: sm.current = 'screen_search'
+            Button:
+                text: 'Colas'
+                on_release: sm.current = 'screen_list'
+            Button:
+                text: 'Sincronizar'
+                on_release: sm.current = 'screen_sync'
+
+        ScreenManager:
+            id: sm
+            Screen_Login:
+            Connected:
+            Screen_Search:
+            Screen_List
+            Screen_Sync:
+
+<Connected>:
+    name: 'connected'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/fondo.jpg'
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            text: "Ahora estas conectado"
+            font_size: 32
+        Button:
+            text: "Desconectar"
+            font_size: 24
+            on_press: root.disconnect()
+
+<Screen_Login>:
+    name: 'screen_login'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/fondo.jpg'
+    BoxLayout
+        id: login_layout
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 50
+
+        Label:
+            text: '¡Bienvenidos a la app de DGas!'
+            font_size: 32
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            Label:
+                text: 'Login'
+                font_size: 18
+                halign: 'left'
+                text_size: root.width-20, 20
+
+            TextInput:
+                id: login
+                focus: True
+                multiline:False
+                font_size: 28
+
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Contraseña'
+                halign: 'left'
+                font_size: 18
+                text_size: root.width-20, 20
+
+            TextInput:
+                id: password
+                multiline:False
+                password:True
+                font_size: 28
+
+        Button:
+            text: 'Login'
+            font_size: 24
+            on_press: root.do_login(login.text, password.text)
+
+<Screen_Search>:
+    name: 'screen_search'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/fondo.jpg'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 50
+
+        Label:
+            text: 'Escriba la placa que desea consultar'
+            font_size: 32
+
+        PlacaInput:
+            id: search
+            multiline:False
+            font_size: 28
+
+        Button:
+            text: 'Buscar'
+            on_press: root.onButtonPress(search.text)
+
+<Screen_List>:
+    name: 'screen_list'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/fondo.jpg'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 10
+
+        Label:
+            text: 'Escriba la placa que desea cargar '
+            font_size: 32
+
+        PlacaInput:
+            id: placa
+            multiline:False
+            font_size: 28
+
+        Label:
+            text: 'Estación'
+
+        Spinner:
+            id: spinner_station
+            text: "Ninguna"
+            values: ("Actualize las estaciones",)
+
+        Button:
+            text: 'Cargar'
+            on_press: root.onButtonResponse(placa.text, spinner_station.text)
+
+<Screen_Sync>:
+    name: 'screen_sync'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/fondo.jpg'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 10
+
+        Label:
+            text: 'Actualizar las estaciones'
+            font_size: 32
+
+        Button:
+            text: 'Actualizar'
+            on_press: root.syncron_stations()
+
+        Label:
+            text: 'Descargar la información'
+            font_size: 32
+
+        Button:
+            text: 'Sincronizar'
+            on_press: root.syncron_colas()
+
+        Label:
+            text: 'Subir la información'
+            font_size: 32
+
+        Button:
+            text: 'Sincronizar'
+            on_press: root.syncron_subir()
+
+        
