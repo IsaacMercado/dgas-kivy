@@ -92,7 +92,9 @@ class Connected(Screen):
 class PlacaInput(TextInput):
     pat = re.compile(r'[^0-9A-Z]')
     def insert_text(self, substring, from_undo=False):
-        s = self.pat.sub('', substring.upper())
+        s = ''
+        if not len(self.text) > 10:
+            s = self.pat.sub('', substring[:10].upper())
         return super(PlacaInput, self).insert_text(s, from_undo=from_undo)
 
 class Screen_Login(Screen):
@@ -432,7 +434,7 @@ class DemoApp(App):
     api_token = StringProperty(None)
 
     def build(self):
-        self.title = 'Aplicacion DGas'
+        self.title = 'Aplicación DGas'
         return Display()
 
     def get_application_config(self):

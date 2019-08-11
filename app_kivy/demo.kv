@@ -1,23 +1,35 @@
 <Display>:
+
     BoxLayout:
         orientation: "vertical"
-
-        BoxLayout:
-            size_hint: 1, None
-            height: '48dp'
-            Button:
-                id: button_login
-                text: 'Login'
-                on_release: root.get_screen_login()
-            Button:
-                text: 'Buscar'
-                on_release: sm.current = 'screen_search'
-            Button:
-                text: 'Colas'
-                on_release: sm.current = 'screen_list'
-            Button:
-                text: 'Sincronizar'
-                on_release: sm.current = 'screen_sync'
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/fondo.jpg'
+        ActionBar:
+            pos_hint: {'top':1}
+            ActionView:
+                use_separator: True
+                ActionPrevious:
+                    title: 'App DGas'
+                    with_previous: False
+                ActionOverflow:
+                ActionButton:
+                    important: True
+                    text: 'Colas'
+                    on_release: sm.current = 'screen_list'
+                ActionButton:
+                    text: 'Buscar'
+                    on_release: sm.current = 'screen_search'
+                ActionGroup:
+                    text: 'Más'
+                    ActionButton:
+                        text: 'Login'
+                        on_release: root.get_screen_login()
+                    ActionButton:
+                        text: 'Sincronizar'
+                        on_release: sm.current = 'screen_sync'
 
         ScreenManager:
             id: sm
@@ -29,34 +41,28 @@
 
 <Connected>:
     name: 'connected'
-    canvas.before:
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'images/fondo.jpg'
     BoxLayout:
         orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 15
 
         Label:
             text: "Ahora estas conectado"
             font_size: 32
         Button:
             text: "Desconectar"
-            font_size: 24
+            font_size: 22
             on_press: root.disconnect()
+            size_hint: (0.5, 0.8)
+            pos_hint: {'center_x': 0.5}
 
 <Screen_Login>:
     name: 'screen_login'
-    canvas.before:
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'images/fondo.jpg'
     BoxLayout
         id: login_layout
         orientation: 'vertical'
         padding: [10,50,10,50]
-        spacing: 50
+        spacing: 15
 
         Label:
             text: '¡Bienvenidos a la app de DGas!'
@@ -93,16 +99,13 @@
 
         Button:
             text: 'Login'
-            font_size: 24
+            font_size: 22
             on_press: root.do_login(login.text, password.text)
+            size_hint: (0.5, 0.8)
+            pos_hint: {'center_x': 0.5}
 
 <Screen_Search>:
     name: 'screen_search'
-    canvas.before:
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'images/fondo.jpg'
     BoxLayout:
         orientation: 'vertical'
         padding: [10,50,10,50]
@@ -116,22 +119,24 @@
             id: search
             multiline:False
             font_size: 28
+            size_hint: (0.5, None)
+            size: (400, 100)
+            pos_hint: {'center_x': 0.5}
 
         Button:
             text: 'Buscar'
             on_press: root.onButtonPress(search.text)
+            font_size: 22
+            size: (400, 100)
+            size_hint: (0.5, None)
+            pos_hint: {'center_x': 0.5}
 
 <Screen_List>:
     name: 'screen_list'
-    canvas.before:
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'images/fondo.jpg'
     BoxLayout:
         orientation: 'vertical'
         padding: [10,50,10,50]
-        spacing: 10
+        spacing: 20
 
         Label:
             text: 'Escriba la placa que desea cargar '
@@ -141,26 +146,30 @@
             id: placa
             multiline:False
             font_size: 28
+            size_hint: (0.5, 0.6)
+            pos_hint: {'center_x': 0.5}
 
         Label:
             text: 'Estación'
+            font_size: 22
 
         Spinner:
             id: spinner_station
             text: "Ninguna"
             values: ("Actualize las estaciones",)
+            font_size: 22
+            size_hint: (0.6, 0.7)
+            pos_hint: {'center_x': 0.5}
 
         Button:
             text: 'Cargar'
             on_press: root.onButtonResponse(placa.text, spinner_station.text)
+            font_size: 22
+            size_hint: (0.5, 0.8)
+            pos_hint: {'center_x': 0.5}
 
 <Screen_Sync>:
     name: 'screen_sync'
-    canvas.before:
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'images/fondo.jpg'
     BoxLayout:
         orientation: 'vertical'
         padding: [10,50,10,50]
@@ -168,26 +177,35 @@
 
         Label:
             text: 'Actualizar las estaciones'
-            font_size: 32
+            font_size: 28
 
         Button:
             text: 'Actualizar'
             on_press: root.syncron_stations()
+            font_size: 22
+            size_hint: (0.5, 0.8)
+            pos_hint: {'center_x': 0.5}
 
         Label:
             text: 'Descargar la información'
-            font_size: 32
+            font_size: 28
 
         Button:
             text: 'Sincronizar'
             on_press: root.syncron_colas()
+            font_size: 22
+            size_hint: (0.5, 0.8)
+            pos_hint: {'center_x': 0.5}
 
         Label:
             text: 'Subir la información'
-            font_size: 32
+            font_size: 28
 
         Button:
             text: 'Sincronizar'
             on_press: root.syncron_subir()
+            font_size: 22
+            size_hint: (0.5, 0.8)
+            pos_hint: {'center_x': 0.5}
 
         
