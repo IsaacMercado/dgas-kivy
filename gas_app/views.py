@@ -15,9 +15,9 @@ class ColaList(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request):
-        print("Load GET")
+        #print("Load GET")
 
-        content = [{'message': 'Hello, World! GET'}]
+        content = {'message': 'not action'}
         action = request.GET.get('action', '')
 
         if action and action == 'update':
@@ -36,9 +36,25 @@ class ColaList(APIView):
         return Response(json.dumps(content))
 
     def post(self, request):
-        print("Load POST")
-        content = [{'message': 'Hello, World! POST'}]
+        #print("Load POST")
+        content = {'cargado': False}
         json_data = json.loads(request.body)
-        #print(json_data)
-        # Create view
+
+        for obj in json_data:
+            car, ccar = Vehiculo.objects.get_or_create(placa=obj['pl'])
+            station = Estacion.objects.get(id=obj['ie'])
+
+            # Seleccion el ultimo combustible creado de la estacion
+            #con = Combustible.objects.filter(estacion=es, tipo_combustible='91').last()
+            con = Combustible.objects.filter(estacion=station).last()
+
+            if obj['ir']:
+                Rebotado.objects.create(combustible=con, vehiculo=car)
+                #print(con, car)
+            else:
+                cdate = datetime.strptime(obj['ca'],"%Y-%m-%dT%H:%M:%S.%f")
+                Cola.objects.create(combustible=con, vehiculo=car, cargado=True, created_at=cdate)
+                #print(con, car, cdate)
+        
+        content['cargado'] = True
         return Response(json.dumps(content))

@@ -30,6 +30,9 @@
                     ActionButton:
                         text: 'Sincronizar'
                         on_release: sm.current = 'screen_sync'
+                    ActionButton:
+                        text: "Salir"
+                        on_press: app.stop() 
 
         ScreenManager:
             id: sm

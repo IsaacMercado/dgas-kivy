@@ -93,7 +93,7 @@ class PlacaInput(TextInput):
     pat = re.compile(r'[^0-9A-Z]')
     def insert_text(self, substring, from_undo=False):
         s = ''
-        if not len(self.text) > 10:
+        if not len(self.text) > 7:
             s = self.pat.sub('', substring[:10].upper())
         return super(PlacaInput, self).insert_text(s, from_undo=from_undo)
 
@@ -136,6 +136,7 @@ class Screen_Login(Screen):
 
 class Screen_Search(Screen):
     def onButtonPress(self, text):
+        self.ids['search'].text = ""
         conn = sqlite3.connect(NAME_DATABASE)
         text_send = '¡Puede cargar!'
         with conn:
@@ -156,7 +157,7 @@ class Screen_Search(Screen):
 class Screen_List(Screen):
 
     def onButtonResponse(self, text, station):
-
+        self.ids['placa'].text = ""
         conn = sqlite3.connect(NAME_DATABASE)
         cstation = None
         cargo = False
@@ -170,9 +171,9 @@ class Screen_List(Screen):
             rows = cur.fetchall()
 
             if rows:
-            	cargo = True
-            	cstation, cdate = rows.pop()
-            	date = datetime.strptime(cdate, "%Y-%m-%dT%H:%M:%S.%f")
+                cargo = True
+                cstation, cdate = rows.pop()
+                date = datetime.strptime(cdate, "%Y-%m-%dT%H:%M:%S.%f")
 
             cur.execute('SELECT * FROM estacion WHERE nombre = "%s"' % station)
             rows = cur.fetchall()
@@ -247,7 +248,7 @@ class Screen_Sync(Screen):
         headers = {"Authorization": "Token {0}".format(app.api_token)}
         req = UrlRequest(URL_ENDPOINT+'?'+params, req_headers=headers,
             on_success=update_stations, on_progress=progress_stations,
-        	on_error=error_stations, on_failure=failure_stations)
+            on_error=error_stations, on_failure=failure_stations)
 
         view = ModalView(size_hint=(None, None), size=(400, 400))
         layout = GridLayout(cols=1, padding=10)
@@ -282,17 +283,21 @@ class Screen_Sync(Screen):
             view.dismiss()
             json_data = json.loads(result)
             #print(json_data)
-            conn = sqlite3.connect(NAME_DATABASE)
-            with conn:
-                cur = conn.cursor()
-                for obj in json_data:
-                    cur.execute('INSERT INTO cola VALUES (NULL, "%s", "%s", "%s", %i, %i);' %\
-                        (obj["estacion"], obj["placa"], obj["created_at"], False, True))
-                cur.execute('INSERT INTO updates VALUES (NULL, "%s");' % self.date_update.isoformat())
+            if isinstance(json_data, list):
+                conn = sqlite3.connect(NAME_DATABASE)
+                with conn:
+                    cur = conn.cursor()
+                    for obj in json_data:
+                        cur.execute('INSERT INTO cola VALUES (NULL, "%s", "%s", "%s", %i, %i);' %\
+                            (obj["estacion"], obj["placa"], obj["created_at"], False, True))
+                    cur.execute('INSERT INTO updates VALUES (NULL, "%s");' % self.date_update.isoformat())
 
-            conn.close()
-            modal_view_alert('Datos cargados','Cerrar',
-                Image(source=SOURCE_CHECK, size=(100,100)))
+                conn.close()
+                modal_view_alert('Datos cargados','Cerrar',
+                    Image(source=SOURCE_CHECK, size=(100,100)))
+            else:
+                modal_view_alert('Datos no cargados correctamente.\nReintente más tarde','Cerrar',
+                    Image(source=SOURCE_CHECK, size=(100,100)))
 
         def error_cola(req, result):
             view.dismiss()
@@ -321,7 +326,7 @@ class Screen_Sync(Screen):
 
         req = UrlRequest(URL_ENDPOINT+'?'+params, req_headers= headers,
             on_success=update_cola, on_progress=progress_cola,
-        	on_error=error_cola, on_failure=failure_cola)
+            on_error=error_cola, on_failure=failure_cola)
 
 
 
@@ -352,21 +357,26 @@ class Screen_Sync(Screen):
                 Image(source=SOURCE_FAIL, size=(100,100)))
 
         headers = {
-        	'Content-type': 'application/json', 
-        	"Authorization": "Token {0}".format(app.api_token)}
+            'Content-type': 'application/json', 
+            "Authorization": "Token {0}".format(app.api_token)}
 
         def progress_subir(req, cs, ts):
             label.text = "Cargando " + str(round(cs*100/ts)) + "%"
 
         def update_subir(req, result):
             view.dismiss()
-            conn = sqlite3.connect(NAME_DATABASE)
-            with conn:
-                cur = conn.cursor()
-                cur.execute('UPDATE cola SET up = 1 WHERE up = 0;')
-            conn.close()
-            modal_view_alert('Datos cargados','Cerrar',
-                Image(source=SOURCE_CHECK, size=(100,100)))
+            json_data = json.loads(result)
+            if json_data['cargado']:
+                conn = sqlite3.connect(NAME_DATABASE)
+                with conn:
+                    cur = conn.cursor()
+                    cur.execute('UPDATE cola SET up = 1 WHERE up = 0;')
+                conn.close()
+                modal_view_alert('Datos cargados','Cerrar',
+                    Image(source=SOURCE_CHECK, size=(100,100)))
+            else:
+                modal_view_alert('Los datos no se cargaron\n correctamente. Reintente más tarde.','Cerrar',
+                    Image(source=SOURCE_FAIL, size=(100,100)))
 
         def error_subir(req, result):
             view.dismiss()
